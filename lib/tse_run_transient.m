@@ -1,4 +1,4 @@
-function [res, rep, params] = tse_run_transient(mpc, Xd_prime, H, D, events, sim)
+function [res, rep, params] = tse_run_transient(mpc, Xd_prime, H, D, R, events, sim)
   % sim: struct with dt, t_end
 
   init = tse_init_case(mpc, Xd_prime);
@@ -23,11 +23,13 @@ function [res, rep, params] = tse_run_transient(mpc, Xd_prime, H, D, events, sim
 
 
   params = struct();
+  params.f_nom = sim.f_nom;
   params.dt = sim.dt;
   params.t_end = sim.t_end;
 
   params.H = H(:);
   params.D = D(:);
+
   params.E_mag = init.E_mag(:);
   params.delta0 = init.delta0(:);
   params.omega0 = init.omega0(:);
@@ -50,8 +52,9 @@ function [res, rep, params] = tse_run_transient(mpc, Xd_prime, H, D, events, sim
 
   % Governor settings (enable/droop/lag)
   params.gov = struct();
-  params.gov.enable = true;
-  params.gov.R  = 0.05 * ones(length(params.E_mag), 1);
+  params.gov.enable = sim.use_gov;
+##  params.gov.R  = 0.05 * ones(length(params.E_mag), 1);
+  params.gov.R = R(:);
   params.gov.Tg = 0.5  * ones(length(params.E_mag), 1);
 
 
